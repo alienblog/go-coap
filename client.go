@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	coapNet "github.com/go-ocf/go-coap/net"
+	coapNet "github.com/alienblog/go-coap/net"
 	"github.com/pion/dtls"
 )
 

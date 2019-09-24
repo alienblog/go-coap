@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	coap "github.com/go-ocf/go-coap"
+	coap "github.com/alienblog/go-coap"
 	"github.com/ugorji/go/codec"
 )
 
