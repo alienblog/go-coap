@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	coap "github.com/go-ocf/go-coap"
+	coap "github.com/alienblog/go-coap"
 )
 
 func handleA(w coap.ResponseWriter, req *coap.Request) {
@@ -32,10 +32,24 @@ func handleB(w coap.ResponseWriter, req *coap.Request) {
 	}
 }
 
+func handleC(w coap.ResponseWriter, req *coap.Request) {
+	log.Printf("Got message in handleB: path=%q: %#v from %v", req.Msg.Path(), req.Msg, req.Client.RemoteAddr())
+	resp := w.NewResponse(coap.Content)
+	resp.SetOption(coap.ContentFormat, coap.TextPlain)
+	resp.SetPayload([]byte("Regex Pattern"))
+	log.Printf("Transmitting from C %#v", resp)
+	ctx, cancel := context.WithTimeout(req.Ctx, time.Second)
+	defer cancel()
+	if err := w.WriteMsgWithContext(ctx, resp); err != nil {
+		log.Printf("Cannot send response: %v", err)
+	}
+}
+
 func main() {
 	mux := coap.NewServeMux()
 	mux.Handle("/a", coap.HandlerFunc(handleA))
 	mux.Handle("/b", coap.HandlerFunc(handleB))
+	mux.Handle(`/c/\d+`, coap.HandlerFunc(handleC))
 
 	log.Fatal(coap.ListenAndServe("udp", ":5688", mux))
 }

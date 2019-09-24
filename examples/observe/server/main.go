@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	coap "github.com/go-ocf/go-coap"
+	coap "github.com/alienblog/go-coap"
 )
 
 func sendResponse(w coap.ResponseWriter, req *coap.Request, subded time.Time) error {

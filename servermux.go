@@ -3,6 +3,8 @@ package coap
 
 import (
 	"errors"
+	"log"
+	"regexp"
 	"sync"
 )
 
@@ -40,11 +42,12 @@ func pathMatch(pattern, path string) bool {
 		}
 		return false
 	default:
-		n := len(pattern)
-		if pattern[n-1] != '/' {
-			return pattern == path
+		m, err := regexp.MatchString(pattern, path)
+		if err != nil {
+			log.Println(err.Error())
+			return false
 		}
-		return len(path) >= n && path[0:n] == pattern
+		return m
 	}
 }
 
@@ -71,7 +74,7 @@ func (mux *ServeMux) match(path string) (h Handler, pattern string) {
 func (mux *ServeMux) Handle(pattern string, handler Handler) error {
 	switch pattern {
 	case "", "/":
-     pattern = "/"
+		pattern = "/"
 	default:
 		if pattern[0] == '/' {
 			pattern = pattern[1:]
@@ -107,16 +110,16 @@ func (mux *ServeMux) DefaultHandleFunc(handler func(w ResponseWriter, r *Request
 
 // HandleRemove deregistrars the handler specific for pattern from the ServeMux.
 func (mux *ServeMux) HandleRemove(pattern string) error {
-  switch pattern {
-    case "", "/":
-     pattern = "/"
-  }
+	switch pattern {
+	case "", "/":
+		pattern = "/"
+	}
 	mux.m.Lock()
-  defer mux.m.Unlock()
-  if _, ok := mux.z[pattern]; ok {
-    delete(mux.z, pattern)
-    return nil
-  }
+	defer mux.m.Unlock()
+	if _, ok := mux.z[pattern]; ok {
+		delete(mux.z, pattern)
+		return nil
+	}
 	return errors.New("pattern is not registered in")
 }
 
